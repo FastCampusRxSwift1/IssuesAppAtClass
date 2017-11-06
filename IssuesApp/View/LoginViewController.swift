@@ -7,15 +7,12 @@
 //
 
 import UIKit
-import OAuthSwift
 
 class LoginViewController: UIViewController {
-    let oauth: OAuth2Swift = OAuth2Swift(
-        consumerKey: "c110aef38d954b31593c",
-        consumerSecret: "67ef2ca554a99dee97fbbd7da5ab6bd4ec8181e7",
-        authorizeUrl: "https://github.com/login/oauth/authorize",
-        accessTokenUrl: "https://github.com/login/oauth/access_token",
-        responseType: "code")
+    static var viewController: LoginViewController {
+        guard let viewContoller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController else { return LoginViewController() }
+        return viewContoller
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -39,16 +36,9 @@ class LoginViewController: UIViewController {
     */
 
     @IBAction func loginToGitHubButtonTapped() {
-        oauth.authorize(
-            withCallbackURL: "issuesapp://oauth-callback/github",
-                    scope: "user,repo",
-                    state: "state",
-                    success: { (credential, _, _) in
-                        let token = credential.oauthToken
-                        print("token: \(token)")
-        }, failure: { error in
-            print(error.localizedDescription)
-        })
+        App.api.getToken { [weak self] in
+            self?.dismiss(animated: true, completion: nil)
+        }
     }
 }
 
